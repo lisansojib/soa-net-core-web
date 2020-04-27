@@ -4,7 +4,7 @@ namespace ApplicationCore
 {
     public static class Constants
     {
-        public static string SYMMETRIC_SECURITY_KEY => Guid.NewGuid().ToString();
+        public const string SYMMETRIC_SECURITY_KEY = "8b327b47-2e48-4116-9134-dcbcd5aff40b";
     }
 
     public static class UserRoles

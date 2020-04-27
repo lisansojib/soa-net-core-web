@@ -2,11 +2,9 @@
 using ApplicationCore.Entities;
 using ApplicationCore.Interfaces.Repositories;
 using AutoMapper;
-using Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Presentation.Filters;
 using Presentation.Interfaces;
 using Presentation.Models;
@@ -19,43 +17,34 @@ namespace Presentation.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly AppDbContext _dbContext;
-        private readonly ITokenBuilder _tokenBuilder;
         private readonly IEfRepository<User> _userRepository;
+        private readonly ITokenBuilder _tokenBuilder;
+        private readonly IPasswordHasher _passwordHasher;
         private readonly IMapper _mapper;
 
         public AuthController(
-            AppDbContext dbContext
+            IEfRepository<User> userRepository
             , ITokenBuilder tokenBuilder
-            , IEfRepository<User> userRepository
+            , IPasswordHasher passwordHasher
             , IMapper mapper)
         {
-            _dbContext = dbContext;
-            _tokenBuilder = tokenBuilder;
             _userRepository = userRepository;
+            _tokenBuilder = tokenBuilder;
+            _passwordHasher = passwordHasher;
             _mapper = mapper;
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody]User user)
+        public async Task<IActionResult> Login([FromBody]LoginBindingModel model)
         {
-            var dbUser = await _dbContext
-                .UserSet
-                .SingleOrDefaultAsync(u => u.Username == user.Username);
+            var user = await _userRepository.FindAsync(x => x.Username == model.UserName);
 
-            if (dbUser == null)
-            {
-                return NotFound("User not found.");
-            }
+            if (user == null) return NotFound("User not found.");
 
-            // This is just an example, made for simplicity; do not store plain passwords in the database
-            // Always hash and salt your passwords
-            var isValid = dbUser.Password == user.Password;
-
-            if (!isValid)
-            {
+            var (Verified, NeedsUpgrade) = _passwordHasher.Check(user.Password, model.Password);
+            
+            if (!Verified)
                 return BadRequest("Could not authenticate user.");
-            }
 
             var token = _tokenBuilder.BuildToken(user.Username);
 
@@ -71,18 +60,11 @@ namespace Presentation.Controllers
                 .SingleOrDefault();
 
             if (username == null)
-            {
                 return Unauthorized();
-            }
 
-            var userExists = await _dbContext
-                .UserSet
-                .AnyAsync(u => u.Username == username.Value);
+            var user = await _userRepository.ExistsAsync(u => u.Username == username.Value);
 
-            if (!userExists)
-            {
-                return Unauthorized();
-            }
+            if (!user) return Unauthorized();
 
             return NoContent();
         }
@@ -91,7 +73,13 @@ namespace Presentation.Controllers
         [ValidateModel]
         public async Task<IActionResult> Register([FromBody] RegisterBindingModel model)
         {
+            // Check if user already exists
+            var userExists = await _userRepository.ExistsAsync(x => x.Username == model.Username.Trim());
+            if (userExists) return BadRequest("User already exists");
+
             var user = _mapper.Map<User>(model);
+
+            user.Password = _passwordHasher.Hash(model.Password);
 
             // Later this fields will be enabled disabled by apis as required.
             user.Verified = true;
