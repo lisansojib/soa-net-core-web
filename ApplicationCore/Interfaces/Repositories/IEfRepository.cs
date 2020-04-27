@@ -18,6 +18,7 @@ namespace ApplicationCore.Interfaces.Repositories
         T Find(int id);
         T Find(Expression<Func<T, bool>> criteria);
         bool Exists(int id);
+        bool Exists(Expression<Func<T, bool>> criteria);
         int Count();
         int GetMaxId();
         List<T> ListAll();
@@ -34,6 +35,7 @@ namespace ApplicationCore.Interfaces.Repositories
         Task<T> FindAsync(int id);
         Task<T> FindAsync(Expression<Func<T, bool>> criteria);
         Task<bool> ExistsAsync(int id);
+        Task<bool> ExistsAsync(Expression<Func<T, bool>> criteria);
         Task<int> CountAsync();
         Task<List<T>> ListAllAsync();
         Task<List<T>> ListAllAsync(int page, int pageSize);

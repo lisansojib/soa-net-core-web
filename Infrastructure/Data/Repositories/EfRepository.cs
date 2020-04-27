@@ -63,9 +63,19 @@ namespace Infrastructure.Data.Repositories
             return _dbSet.Any(x => x.Id == id);
         }
 
+        public bool Exists(Expression<Func<T, bool>> criteria)
+        {
+            return _dbSet.Any(criteria);
+        }
+
         public async Task<bool> ExistsAsync(int id)
         {
             return await _dbSet.AnyAsync(x => x.Id == id);
+        }
+
+        public async Task<bool> ExistsAsync(Expression<Func<T, bool>> criteria)
+        {
+            return await _dbSet.AnyAsync(criteria);
         }
 
         public T Find(int id)
