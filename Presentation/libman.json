@@ -9,6 +9,10 @@
     {
       "library": "twitter-bootstrap@4.4.0",
       "destination": "wwwroot/lib/bootstrap/"
+    },
+    {
+      "library": "axios@0.19.2",
+      "destination": "wwwroot/lib/axios/"
     }
   ]
 }
