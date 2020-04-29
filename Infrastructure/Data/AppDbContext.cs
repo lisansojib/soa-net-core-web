@@ -11,6 +11,7 @@ namespace Infrastructure.Data
         }
 
         public DbSet<User> UserSet { get; set; }
+        public DbSet<Ticket> TicketSet { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
