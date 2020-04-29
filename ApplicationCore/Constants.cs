@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ApplicationCore
+﻿namespace ApplicationCore
 {
     public static class Constants
     {
@@ -9,7 +7,7 @@ namespace ApplicationCore
 
     public static class UserRoles
     {
-        public const string GENERAL = "General";
+        public const string User = "User";
         public const string ADMIN = "Admin";
     }
 }

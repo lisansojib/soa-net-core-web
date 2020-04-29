@@ -2,13 +2,18 @@
 using ApplicationCore.Entities;
 using ApplicationCore.Interfaces.Repositories;
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Filters;
 using Presentation.Interfaces;
 using Presentation.Models;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Presentation.Controllers
@@ -37,7 +42,7 @@ namespace Presentation.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody]LoginBindingModel model)
         {
-            var user = await _userRepository.FindAsync(x => x.Username == model.UserName);
+            var user = await _userRepository.FindAsync(x => x.Email == model.Email);
 
             if (user == null) return NotFound("User not found.");
 
@@ -45,6 +50,27 @@ namespace Presentation.Controllers
             
             if (!Verified)
                 return BadRequest("Could not authenticate user.");
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Role, user.Role),
+            };
+
+            var authProperties = new AuthenticationProperties
+            {
+                IsPersistent = model.RememberMe,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1)
+            };
+
+            var claimsIdentity = new ClaimsIdentity(
+                claims,
+                CookieAuthenticationDefaults.AuthenticationScheme);
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                authProperties);
 
             var token = _tokenBuilder.BuildToken(user.Username);
 
@@ -74,17 +100,18 @@ namespace Presentation.Controllers
         public async Task<IActionResult> Register([FromBody] RegisterBindingModel model)
         {
             // Check if user already exists
-            var userExists = await _userRepository.ExistsAsync(x => x.Username == model.Username.Trim());
+            var userExists = await _userRepository.ExistsAsync(x => x.Email == model.Email.Trim());
             if (userExists) return BadRequest("User already exists");
 
             var user = _mapper.Map<User>(model);
 
             user.Password = _passwordHasher.Hash(model.Password);
+            user.Username = model.Email;
 
             // Later this fields will be enabled disabled by apis as required.
             user.Verified = true;
             user.Active = true;
-            user.Role = UserRoles.GENERAL;
+            user.Role = UserRoles.User;
 
             await _userRepository.AddAsync(user);
 
