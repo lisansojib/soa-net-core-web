@@ -5,6 +5,7 @@ using ApplicationCore.Interfaces.Logger;
 using ApplicationCore.Interfaces.Repositories;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers
@@ -50,6 +51,7 @@ namespace Presentation.Controllers
             return View();
         }
 
+        [Authorize]
         [HttpGet]
         public IActionResult Profile()
         {

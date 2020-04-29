@@ -1,0 +1,17 @@
+﻿
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<div class="card text-center">
+    <div class="card-header">
+        Welcome to SOA
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">@User.Identity.Name</h5>
+        <img class="img-thumbnail" src="~/img/avatar.png" alt="Profile Pic" />
+    </div>
+    <div class="card-footer text-muted">
+        <a href="javascript:void(0);">Update Profile</a>
+    </div>
+</div>
