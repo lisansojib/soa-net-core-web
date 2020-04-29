@@ -25,7 +25,7 @@
             axios.post('/api/auth/login', data)
                 .then(function (response) {
                     toastr.success("Login successful!");
-                    localStorage.setItem("token", response.data.access_token);
+                    localStorage.setItem("token", response.data);
                     window.location.href = "/account/profile";
                 })
                 .catch(function (err) {
