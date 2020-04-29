@@ -7,8 +7,8 @@ namespace Presentation.Validators
     {
         public LoginBindingModelValidator()
         {
-            RuleFor(x => x.UserName).NotEmpty().MaximumLength(20);
-            RuleFor(x => x.Password).NotEmpty().MaximumLength(20);
+            RuleFor(x => x.Email).EmailAddress();
+            RuleFor(x => x.Password).NotEmpty().MinimumLength(6).MaximumLength(20);
         }
     }
 }

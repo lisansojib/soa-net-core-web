@@ -1,0 +1,26 @@
+﻿
+@{
+    ViewData["Title"] = "Create An Account";
+}
+
+<h3 class="text-center display-4">Create An Account</h3>
+
+<div class="row pt-5">
+    <div class="col-sm-12 offset-4 col-md-4 align-self-center">
+        <form id="register-form">
+            <div class="form-group">
+                <label for="Email">Email address</label>
+                <input type="email" class="form-control" id="Email" name="Email">
+            </div>
+            <div class="form-group">
+                <label for="Password">Password</label>
+                <input type="password" class="form-control" id="Password" name="Password">
+            </div>
+            <button type="button" id="btn-register" class="btn btn-block btn-outline-primary">Register</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/account/register.js"></script>
+}
