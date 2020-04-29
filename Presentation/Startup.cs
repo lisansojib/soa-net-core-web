@@ -10,7 +10,6 @@ using Infrastructure.Data;
 using Infrastructure.Data.Repositories;
 using Infrastructure.Logger;
 using Infrastructure.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -23,8 +22,9 @@ using Microsoft.IdentityModel.Tokens;
 using Presentation.AutoMapping;
 using Presentation.Interfaces;
 using Presentation.Services;
-using Presentation.Models;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Presentation.Validators;
 
 namespace Presentation
 {
@@ -96,26 +96,23 @@ namespace Presentation
             });
 
             services
-               .AddAuthentication(options =>
+               .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+               .AddCookie()
+               .AddJwtBearer(cfg =>
                {
-                   options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                   options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-               })
-                .AddJwtBearer(cfg =>
-                {
-                    cfg.RequireHttpsMetadata = true;
-                    cfg.SaveToken = true;
-                    cfg.TokenValidationParameters = new TokenValidationParameters()
-                    {
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Constants.SYMMETRIC_SECURITY_KEY)),
-                        ValidateAudience = false,
-                        ValidateIssuer = false,
-                        ValidateLifetime = false,
-                        RequireExpirationTime = false,
-                        ClockSkew = TimeSpan.Zero,
-                        ValidateIssuerSigningKey = true
-                    };
-                });
+                   cfg.RequireHttpsMetadata = true;
+                   cfg.SaveToken = true;
+                   cfg.TokenValidationParameters = new TokenValidationParameters()
+                   {
+                       IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Constants.SYMMETRIC_SECURITY_KEY)),
+                       ValidateAudience = false,
+                       ValidateIssuer = false,
+                       ValidateLifetime = false,
+                       RequireExpirationTime = false,
+                       ClockSkew = TimeSpan.Zero,
+                       ValidateIssuerSigningKey = true
+                   };
+               });
 
             services.AddAutoMapper(c => c.AddProfile<AutoMappingProfile>(), typeof(Startup));
 
@@ -124,7 +121,7 @@ namespace Presentation
                 options.Conventions.Add(new RouteTokenTransformerConvention(
                          new SlugifyParameterTransformer()));
 
-            }).AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<LoginBindingModel>());                     
+            }).AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<LoginBindingModelValidator>());                     
 
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
 
@@ -170,6 +167,8 @@ namespace Presentation
 
             app.UseRouting();
 
+            // It's important that you place the Authentication and Authorization middleware between UseRouting and UseEndPoints .
+            app.UseAuthentication();
             app.UseAuthorization();
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
@@ -184,6 +183,8 @@ namespace Presentation
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapRazorPages();
+                endpoints.MapControllers();
                 endpoints.MapControllerRoute("default", "{controller:slugify=Home}/{action:slugify=Index}/{id?}");
             });
         }
