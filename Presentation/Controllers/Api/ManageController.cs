@@ -37,7 +37,7 @@ namespace Presentation.Controllers.Api
             {
                 var file = Request.Form.Files[0];
                 var folderPath = Path.Combine("uploads", "profile-pic");
-                var pathToSave = Path.Combine(_webHostEnvironment.WebRootPath, Constants.PROFILE_PHOTO_DIRECTORY);
+                var pathToSave = Path.Combine(_webHostEnvironment.WebRootPath, folderPath);
 
                 if (file.Length == 0) return BadRequest();
 
