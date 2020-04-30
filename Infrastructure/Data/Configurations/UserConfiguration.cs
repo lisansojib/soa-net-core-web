@@ -17,6 +17,7 @@ namespace Infrastructure.Data.Config
             builder.Property(t => t.Email).IsRequired().HasMaxLength(500);
             builder.Property(t => t.Password).IsRequired().HasMaxLength(100);
             builder.Property(t => t.Role).IsRequired().HasMaxLength(20);
+            builder.Property(t => t.PhotoUrl).HasMaxLength(500);
 
             builder.HasAlternateKey(t => t.Username).HasName("UniqueKey_Username");
             builder.HasAlternateKey(t => t.Email).HasName("UniqueKey_Email");
