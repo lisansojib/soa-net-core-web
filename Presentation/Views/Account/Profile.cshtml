@@ -9,9 +9,16 @@
     </div>
     <div class="card-body">
         <h5 class="card-title">@User.Identity.Name</h5>
-        <img class="img-thumbnail" src="~/img/avatar.png" alt="Profile Pic" />
+        <img class="img-thumbnail" id="preview-profile-pic" src="@ViewBag.ProfileUrl" alt="Profile Pic" style="max-width: 200px; max-height: 200px" />
+        <input type="file" name="ProfilePic" id="ProfilePic" accept="image/jpeg,image/png" style="display:none" />
+        <br />
+        <button id="btn-change-photo" class="btn btn-link">Change Photo</button>
     </div>
     <div class="card-footer text-muted">
-        <a href="javascript:void(0);">Update Profile</a>
+        <button class="btn btn-outline-primary" id="btn-update-profile-pic" disabled>Update Profile Pic</button>
     </div>
 </div>
+
+@section Scripts{ 
+    <script src="~/js/account/profile.js"></script>
+}

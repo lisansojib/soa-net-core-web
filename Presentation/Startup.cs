@@ -25,6 +25,7 @@ using Presentation.Services;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Presentation.Validators;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace Presentation
 {
@@ -81,7 +82,6 @@ namespace Presentation
             services.AddScoped(typeof(IEfRepository<>), typeof(EfRepository<>));
             services.AddScoped(typeof(IAppLogger<>), typeof(LoggerAdapter<>));
             services.AddTransient<IEmailSenderService, EmailSenderService>();
-
             services.AddScoped<IPasswordHasher, PasswordHasher>();
             services.AddScoped<ITokenBuilder, TokenBuilder>();
 
@@ -128,6 +128,14 @@ namespace Presentation
             services.AddHttpContextAccessor();
 
             services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "SOA API", Version = "v1" }));
+
+            // To avoid MultiPartBodyLength error
+            services.Configure<FormOptions>(opt =>
+            {
+                opt.ValueLengthLimit = int.MaxValue;
+                opt.MultipartBodyLengthLimit = int.MaxValue;
+                opt.MemoryBufferThreshold = int.MaxValue;
+            });
 
             _services = services; // used to debug registered services
         }

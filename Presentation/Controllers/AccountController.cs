@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ApplicationCore;
 
 namespace Presentation.Controllers
 {
@@ -54,8 +55,11 @@ namespace Presentation.Controllers
 
         [Authorize]
         [HttpGet]
-        public IActionResult Profile()
+        public async Task<IActionResult> Profile()
         {
+            var user = await _userRepository.FindAsync(x => x.Username == User.Identity.Name);
+            ViewBag.ProfileUrl = user.PhotoUrl.IsNullOrEmpty() ? Constants.DEFAULT_PROFILE_PHOTO : user.PhotoUrl;
+
             return View();
         }
     }

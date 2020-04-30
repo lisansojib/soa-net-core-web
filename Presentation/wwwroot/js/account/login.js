@@ -5,14 +5,14 @@
 
             var btnLogin = $(this);
             var originalText = btnLogin.html();
-            disableButton(btnLogin);
+            setLoadingButton(btnLogin);
 
             var $formEl = $("#login-form");
 
             initializeValidation($formEl, validationConstraints);
             if (!isValidForm($formEl, validationConstraints)) {
                 toastr.error("Please correct all valiation errors.");
-                enableButton(btnLogin, originalText);
+                resetLoadingButton(btnLogin, originalText);
                 return;
             }
             else {
@@ -28,9 +28,11 @@
                     localStorage.setItem("token", response.data);
                     window.location.href = "/account/profile";
                 })
-                .catch(function (err) {
+                .catch(function () {
                     toastr.error("Invalid username or password!");
-                    enableButton(btnLogin, originalText);
+                })
+                .then(function () {
+                    resetLoadingButton($btnUpdateProfilePic, btnContent);
                 });
         });
     });

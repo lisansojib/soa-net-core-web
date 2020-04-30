@@ -205,20 +205,20 @@ function getMaxIdForArray(data, filterBy) {
 }
 
 /**
- * Disable button and show loading indicator
+ * Make button loading while request is processing
  * @param {HTMLButtonElement} $buttonEl - Button Element
  */
-function disableButton($buttonEl) {
+function setLoadingButton($buttonEl) {
     $buttonEl.prop("disabled", true);
     $buttonEl.html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`);
 }
 
 /**
- * Button Element
+ * Reset loading button and set to original state
  * @param {HTMLButtonElement} $buttonEl - Button Element
  * @param {originalText} - Original Butto Text
  */
-function enableButton($buttonEl, originalText) {
+function resetLoadingButton($buttonEl, originalText) {
     $buttonEl.html(originalText);
     $buttonEl.prop("disabled", false);
 }
