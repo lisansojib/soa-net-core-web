@@ -73,6 +73,10 @@ namespace Infrastructure.Data.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
+                    b.Property<string>("PhotoUrl")
+                        .HasColumnType("nvarchar(500)")
+                        .HasMaxLength(500);
+
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("nvarchar(20)")
