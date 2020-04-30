@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace Presentation.Extensions
+﻿namespace Microsoft.AspNetCore.Mvc
 {
     public static class UrlHelperExtensions
     {
